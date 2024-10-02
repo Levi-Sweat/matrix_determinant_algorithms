@@ -18,10 +18,10 @@ def print_matrix(matrix):
             if j > 0:
                 print(", ", end="")
             
+            max_digits = 0
             #for each row
             for k in range(0, len(matrix)):
                 #count the number of digits for each element at that jth element in the kth row
-                max_digits = 0
                 if len(str(matrix[k][j])) > max_digits:
                     max_digits = len(str(matrix[k][j]))
             
@@ -35,9 +35,9 @@ def print_matrix(matrix):
 
 
 
+#matrix = initialize_random_matrix(3)
 
-#print_matrix(initialize_random_matrix(3))
-matrix = initialize_random_matrix(3)
-print("len: ", len(matrix))
+matrix =[[-1.124, 2.0, 3.0], [4.0, 5432.53, 5], [7.0, 8.0, 9.0]]
+
 print_matrix(matrix)
 #print(len(str(matrix[0][2])))
