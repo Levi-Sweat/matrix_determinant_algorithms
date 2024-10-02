@@ -23,5 +23,8 @@ if matrix[0][0][1] == '[':
 
 new_string = matrix[0][0][matrix[0][0].find('m')+1:matrix[0][0].rfind('\x1b')]
 
-print("result: " + new_string)
-print(len(new_string))
+for i in range(size ** 2):
+    print("i // size: " + str(i // size))
+    print("i % size: " + str(i % size))
+
+print(new_string.count('0'))
