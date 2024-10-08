@@ -137,22 +137,83 @@ def laplace_expansion(matrix):
 
 def plu_decomp(matrix):    
     '''
-    LU decomposition of a matrix, using deloittles algorithm (maybe?)
+    PLU decomposition of a matrix. Determinant is simply the diagonal elements of U
+    multiplied together, with a negative sign if there were an odd number of permutations.
+    Args:
+        matrix: (2d list) the matrix to be decomposed
+    Returns:
+        det: (float) the determinant of the matrix (Note: because the determinant is a float, 
+        sometimes it is not exactly the whole number we expect, but instead a fraction that is very close to it)
     '''
     #let U just be a copy of the original matrix
     U = matrix.copy()
 
-    #initialize L and P to be identity matrices
+    #initialize L and P to be identity matrices of the correct size
     L = []
     for i in range(len(U[0])):
         L.append([0] * len(U))
         L[i][i] = 1
 
     P = L.copy()
+    permutations = 0
 
+
+    for i in range(len(U[0])):
+
+        #Swap rows if necessary
+        for k in range(i, len(matrix[0])): 
+            if (U[i][i] != 0.0):
+                break
+            U[[k][k+1]] = U[[k+1][k]]
+            P[[k][k+1]] = P[[k+1][k]]
+            permutations += 1
+
+        #optimized gaussian elimination to find L & U
+        for j in range(i + 1, len(U[0])): 
+            # Set  lji=uji/uii
+            L[j][i] = U[j][i] / U[i][i]
+
+            row = []
+            for element in U[i]:
+                row.append(element * L[j][i])
+            
+            for l in range(len(U[j])):
+                U[j][l] = U[j][l] - row[l]
+
+    det = 1
+    #for PLU decomp, the determinant is the product of the diagonal elements of U
+    for m in range(len(U)):
+        det *= U[m][m]
+
+    #if there were an odd number of permutations, the determinant is negated
+    if permutations % 2 == 1:
+        det *= -1
     
+    return det
 
 
+def multiply(matrix1, matrix2):
+    '''
+    Multiplies two matrices together
+    Args:
+        matrix1: (2d list) the first matrix to be multiplied
+        matrix2: (2d list) the second matrix to be multiplied
+    Returns:
+        result: (2d list) the result of the matrix multiplication
+    '''
+    # Get the size of the matrix (assuming both are square and same size)
+    n = len(matrix1)
+    
+    # Initialize the result matrix with zeros
+    result = [[0 for _ in range(n)] for _ in range(n)]
+    
+    # Perform matrix multiplication
+    for i in range(n):
+        for j in range(n):
+            for k in range(n):
+                result[i][j] += matrix1[i][k] * matrix2[k][j]
+    
+    return result
 
 def bareiss_algorithm(matrix):
     return
@@ -191,7 +252,7 @@ def main():
         case "1":
             print("determinant: ", laplace_expansion(matrix))
         case "2":
-            plu_decomp(matrix)
+            print("determinant: ", plu_decomp(matrix))
         case "3":
             bareiss_algorithm(matrix)
 
