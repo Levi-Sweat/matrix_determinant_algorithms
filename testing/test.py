@@ -41,3 +41,25 @@ matrix =[[-1.124, 2.0, 3.0], [4.0, 5432.53, 5], [7.0, 8.0, 9.0]]
 
 print_matrix(matrix)
 #print(len(str(matrix[0][2])))
+
+
+
+    number_of_permutations = 0
+    
+    #Loop over rows
+    for i in range(n):
+        
+        for k in range(i, n): 
+            if ~np.isclose(U[i, i], 0.0):
+                break
+            U[[k, k+1]] = U[[k+1, k]]
+            P[[k, k+1]] = P[[k+1, k]]
+            number_of_permutations += 1
+            
+        #Eliminate entries below i with row operations on U and
+        #reverse the row operations to manipulate L
+        factor = U[i+1:, i] / U[i, i]
+        L[i+1:, i] = factor
+        U[i+1:] -= factor[:, np.newaxis] * U[i]
+        
+    return U, number_of_permutations

@@ -1,30 +1,16 @@
 from colorama import Back, Style, Fore
+from numpy import isclose, eye, array
 
-size = 5
-matrix = []
-for i in range(size):
-    row = []
-    for j in range(size):
-        row.append(Back.RED + "500" + Style.RESET_ALL)
-    matrix.append(row)
+matrix = [[1, 2, 3],
+          [4, 5, 6],
+          [7, 8, 9]]
 
-print("matrix 0: " + matrix[0][0][0])
+L = eye(3)
 
-print("matrix 1: " + matrix[0][0][1])
+U = array([[1, 2, 3],
+           [4, 5, 6],
+           [7, 8, 9]])
 
-print("matrix 2: " + matrix[0][0][2])
+print(U[0, 2])
 
-print("matrix 3: " + matrix[0][0][3])
-
-print("matrix 4: " + matrix[0][0][4])
-
-if matrix[0][0][1] == '[':
-    print("TRUE")
-
-new_string = matrix[0][0][matrix[0][0].find('m')+1:matrix[0][0].rfind('\x1b')]
-
-for i in range(size ** 2):
-    print("i // size: " + str(i // size))
-    print("i % size: " + str(i % size))
-
-print(new_string.count('0'))
+print(matrix[0][2])

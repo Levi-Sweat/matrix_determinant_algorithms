@@ -116,25 +116,43 @@ def determinant_choice():
 def laplace_expansion(matrix):
     '''
     O(n!) time complexity-recursively computes determinant using Laplace Expansion
+    Args:
+        matrix: (2d array) the matrix to compute the determinant of
+    Returns:
+        det: (float) the determinant of the matrix
     '''
         # Base case of recursive function: 1x1 matrix
     if len(matrix) == 1: 
         return matrix[0][0]
 
-    total = 0
+    det = 0
     for column, element in enumerate(matrix[0]):
         # Exclude first row and current column.
         K = [x[:column] + x[column + 1 :] for x in matrix[1:]]
         #multiply by 1 or -1
         s = 1 if column % 2 == 0 else -1 
         #recursive call
-        total += s * element * laplace_expansion(K)
-    return total
+        det += s * element * laplace_expansion(K)
+    return det
 
-def lu_decomposition(matrix):
-    # https://johnfoster.pge.utexas.edu/numerical-methods-book/LinearAlgebra_LU.html
-    # need PLU for determinant (near te bottom)
-    return
+def plu_decomp(matrix):    
+    '''
+    LU decomposition of a matrix, using deloittles algorithm (maybe?)
+    '''
+    #let U just be a copy of the original matrix
+    U = matrix.copy()
+
+    #initialize L and P to be identity matrices
+    L = []
+    for i in range(len(U[0])):
+        L.append([0] * len(U))
+        L[i][i] = 1
+
+    P = L.copy()
+
+    
+
+
 
 def bareiss_algorithm(matrix):
     return
@@ -173,7 +191,7 @@ def main():
         case "1":
             print("determinant: ", laplace_expansion(matrix))
         case "2":
-            lu_decomposition(matrix)
+            plu_decomp(matrix)
         case "3":
             bareiss_algorithm(matrix)
 
