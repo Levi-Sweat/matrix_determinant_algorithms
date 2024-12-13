@@ -1,6 +1,10 @@
 import random
 from colorama import Back, Style, Fore
-
+import time
+import copy
+#important srcs:
+# https://johnfoster.pge.utexas.edu/numerical-methods-book/LinearAlgebra_LU.html
+# https://github.com/adolfos94/Bareiss-Algorithm
 
 def user_input():
     print("This program calculates the determinant of a square matrix using different algorithms.")
@@ -108,10 +112,20 @@ def print_matrix(matrix):
         print("]") #ending each row
 
 def determinant_choice():
-    choice = input("Which algorithm would you like to use to calculate the determinant? (1/2/3)\n1. Laplace Expansion\n2. LU Decomposition\n3. Bareiss Algorithm\n")
-    while choice != "1" and choice != "2" and choice != "3":
-        choice = input("Please enter a valid choice.\n")
-    return choice
+    num = input("How many algorithms would you like to use to calculate the determinant? (1/2/3)\n")
+    while num != "1" and num != "2" and num != "3":
+        num = input("Please enter a valid choice.\n")
+
+    choices = []
+    for i in range(1, int(num) + 1):
+        choice = input("Which algorithm would you like to use to calculate the determinant? (1/2/3)\n1. Laplace Expansion\n2. LU Decomposition\n3. Bareiss Algorithm\n")
+        while choice != "1" and choice != "2" and choice != "3":
+            choice = input("Please enter a valid choice.\n")
+        while choice in choices:
+            choice = input("Please enter an algorithm that hasn't already been selected.\n")
+        choices.append(choice)
+    
+    return choices 
 
 def laplace_expansion(matrix):
     '''
@@ -126,6 +140,9 @@ def laplace_expansion(matrix):
         return matrix[0][0]
 
     det = 0
+    #column = number (0, 1, 2, ...)
+    #element = actual values of that column
+
     for column, element in enumerate(matrix[0]):
         # Exclude first row and current column.
         K = [x[:column] + x[column + 1 :] for x in matrix[1:]]
@@ -133,6 +150,28 @@ def laplace_expansion(matrix):
         s = 1 if column % 2 == 0 else -1 
         #recursive call
         det += s * element * laplace_expansion(K)
+    return det
+
+
+#might need for bareiss algo
+def swap_0pivot_rows(matrix):
+
+
+    return matrix
+
+def bareiss_algo(matrix):
+    pivot = 1
+    for k in range(len(matrix) - 1):
+        for i in range(k + 1, len(matrix)):
+            for j in range(k + 1, len(matrix)):
+                matrix[i][j] = matrix[k][k] * matrix[i][j] - matrix[i][k] * matrix[k][j]
+                print("matrix[i][j]:", matrix[i][j])
+                print("pivot:", pivot)
+                matrix[i][j] = matrix[i][j] // pivot
+        
+        pivot = matrix[k][k]
+
+    det = matrix[len(matrix) - 1][len(matrix) - 1]
     return det
 
 def plu_decomp(matrix):    
@@ -155,23 +194,25 @@ def plu_decomp(matrix):
         L[i][i] = 1
 
     P = L.copy()
-    permutations = 0
 
+    permutations = 0
 
     for i in range(len(U[0])):
 
         #Swap rows if necessary
         for k in range(i, len(matrix[0])): 
-            if (U[i][i] != 0.0):
+            if (U[i][i] != 0):
                 break
             U[[k][k+1]] = U[[k+1][k]]
-            P[[k][k+1]] = P[[k+1][k]]
             permutations += 1
 
         #optimized gaussian elimination to find L & U
-        for j in range(i + 1, len(U[0])): 
+        for j in range(i + 1, len(U[0])): #lii never gets changed from 1 because j is always i + 1
             # Set  lji=uji/uii
-            L[j][i] = U[j][i] / U[i][i]
+            L[j][i] = U[j][i] / U[i][i] #this line should be changed to just being called the ratio
+                                        #and not changing the elements of L, as doing so  makes it upper triangular
+            
+            print("L[j][i]:", L[j][i])
 
             row = []
             for element in U[i]:
@@ -179,6 +220,9 @@ def plu_decomp(matrix):
             
             for l in range(len(U[j])):
                 U[j][l] = U[j][l] - row[l]
+                print("U[j][l]:", U[j][l])
+
+            
 
     det = 1
     #for PLU decomp, the determinant is the product of the diagonal elements of U
@@ -215,9 +259,6 @@ def multiply(matrix1, matrix2):
     
     return result
 
-def bareiss_algorithm(matrix):
-    return
-
 def small_edge_cases(matrix):
     if len(matrix) == 1:
         print("The determinant of a 1x1 matrix is itself")
@@ -239,22 +280,54 @@ def main():
     else:
         matrix = initialize_matrix(size)
     
-    if size < 3:
-        small_edge_cases(matrix)
-
     #convert str values in matrix to float values
     matrix = [[float(x) for x in row] for row in matrix]
 
 
-    choice = determinant_choice()
+    if size < 3:
+        small_edge_cases(matrix)
 
-    match choice:
-        case "1":
-            print("determinant: ", laplace_expansion(matrix))
-        case "2":
-            print("determinant: ", plu_decomp(matrix))
-        case "3":
-            bareiss_algorithm(matrix)
+    choices = determinant_choice()
+
+    for choice in choices:
+        #determinant
+        match choice:
+            case "1":
+                start = time.time_ns()
+                print("determinant using laplace expansion: ", laplace_expansion(matrix))
+                end = time.time_ns()
+                total = (end - start) / 1000000000
+                print("Time taken: ", total, " seconds\n\n")
+            case "2":
+                cp_matrix = copy.deepcopy(matrix)
+                start = time.time_ns()
+                print("determinant using plu decomposition: ", plu_decomp(cp_matrix))
+                end = time.time_ns()
+                total = (end - start) / 1000000000
+                print("Time taken: ", total, " seconds\n\n")
+                print("Time taken 2 : ", (end - start), "\n\n")
+                print("start:", start)
+                print("end:", end, "\n\n")
+
+
+            case "3":
+                for i, row in enumerate(matrix):
+                    for j, value in enumerate(row):
+                        if not value.is_integer():
+                            print(Fore.RED + "Bareiss Algorithm only works with integer matrices." + Style.RESET_ALL)
+                            exit()
+
+
+                matrix = [[int(x) for x in row] for row in matrix]
+                start = time.time_ns()
+                print("determinant using bareiss algo: ", bareiss_algo(matrix))
+                end = time.time_ns()
+                total = (end - start) / 1000000000
+                print("Time taken: ", total, " seconds\n\n")
+                print("Time taken 2 : ", (end - start), " seconds\n\n")
+                print("start:", start)
+                print("end:", end, "\n\n")
+
 
     
 

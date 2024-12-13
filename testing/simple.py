@@ -1,5 +1,9 @@
 from colorama import Back, Style, Fore
 import numpy as np
+import time as time
+
+
+start_time = time.time_ns()
 
 
 u2 = [[1, 1, 0], [2, 1, -1], [3, -1, -1]]
@@ -78,3 +82,14 @@ def multiply(matrix1, matrix2):
     return result
 
 try2(u2, L)
+
+end_time = time.time_ns()
+
+
+
+print("Time taken : ", end_time - start_time)
+print("Start time : ", start_time)
+print("End time : ", end_time)
+
+seconds = (end_time - start_time) / 1000000000
+print("Seconds : ", seconds)
